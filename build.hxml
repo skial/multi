@@ -1,0 +1,17 @@
+-lib mo
+-lib cmd
+-lib hxssl
+-lib thx.core
+-lib thx.semver
+-cp src
+
+--each
+
+-neko bin/multihaxe.n
+-main uhx.multi.haxe.LibRunner
+
+--next
+
+-D net-ver=40
+-cs bin/cs/
+-main uhx.multi.cs.Helper
