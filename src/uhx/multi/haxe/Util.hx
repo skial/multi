@@ -14,7 +14,7 @@ class Util {
 	public static var is64BitOS(get, null):Bool;
 	public static var userProfile(get, null):String;
 	
-	public static function init():Void {
+	public static function initialize():Void {
 		var process = new Process( 'Helper.exe', [] );
 		raw = Json.parse( process.stdout.readAll().toString() );
 		process.exitCode();

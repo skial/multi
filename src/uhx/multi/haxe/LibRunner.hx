@@ -1,5 +1,6 @@
 package uhx.multi.haxe;
 
+import haxe.Constraints.Constructible;
 import haxe.io.Output;
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -12,6 +13,8 @@ using haxe.io.Path;
 using sys.FileSystem;
 using thx.semver.Version;
 
+//import uhx.multi.haxe.Resource.TResource;
+
 /**
  * ...
  * @author Skial Bainn
@@ -19,9 +22,7 @@ using thx.semver.Version;
 @:cmd
 class LibRunner {
 	
-	public static inline var stableDownload:String = "http://haxe.org/download/file/";
-	public static inline var stableVersions:String = "https://raw.githubusercontent.com/HaxeFoundation/haxe.org/master/www/website-content/downloads/versions.json";
-	public static inline var nightlyDownload:String = "http://hxbuilds.s3-website-us-east-1.amazonaws.com/builds/haxe/";
+	private static var handlers:Array<Class<Resource>> = [Stable, Nightly];
 	
 	public static function main() {
 		var librunner = new LibRunner( Sys.args() );
@@ -54,13 +55,13 @@ class LibRunner {
 	public function new(args:Array<String>) {
 		@:cmd _;
 		
-		init();
+		initialize();
 		setup();
 		process();
 	}
 	
-	private function init():Void {
-		Util.init();
+	private function initialize():Void {
+		Util.initialize();
 	}
 	
 	private function setup():Void {
@@ -97,10 +98,10 @@ class LibRunner {
 				case ['stable', Version.VERSION.match(_) => true]: 
 					var version = (versions[1]:Version);
 					
-				case ['nightly', _.length >= 7 => true]: 
+				case ['nightly', _.length >= 7 => true]:
 					
 					
-				case _: 
+				case _:
 					Sys.println( 'Version `' + versions.join('-') + '` does not appear to exist.' );
 					
 			}
