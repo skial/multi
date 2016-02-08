@@ -1,4 +1,4 @@
-package uhx.multi.haxe;
+package uhx.multi;
 
 import haxe.Json;
 import sys.io.Process;

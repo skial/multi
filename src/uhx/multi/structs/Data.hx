@@ -1,4 +1,6 @@
-package uhx.multi.haxe;
+package uhx.multi.structs;
+
+import uhx.multi.Download;
 
 /**
  * ...

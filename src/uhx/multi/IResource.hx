@@ -1,11 +1,11 @@
-package uhx.multi.haxe;
+package uhx.multi;
 
 //import haxe.Constraints.Constructible;
 
 /**
  * @author Skial Bainn
  */
-interface Resource {
+interface IResource {
   
 	public var name(default, never):String;
 	public var download(default, never):String;

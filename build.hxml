@@ -8,7 +8,7 @@
 --each
 
 -neko bin/multihaxe.n
--main uhx.multi.haxe.LibRunner
+-main uhx.multi.LibRunner
 
 --next
 

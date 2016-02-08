@@ -1,11 +1,14 @@
-package uhx.multi.haxe;
+package uhx.multi;
 
+import uhx.multi.haxe.Stable;
+import uhx.multi.haxe.Nightly;
+import uhx.multi.structs.Data;
 import haxe.Constraints.Constructible;
 import haxe.io.Output;
 import haxe.Serializer;
 import haxe.Unserializer;
 import thx.semver.Version;
-import uhx.multi.haxe.Util.*;
+import uhx.multi.Util.*;
 
 using StringTools;
 using sys.io.File;
@@ -22,7 +25,7 @@ using thx.semver.Version;
 @:cmd
 class LibRunner {
 	
-	private static var handlers:Array<Class<Resource>> = [Stable, Nightly];
+	private static var handlers:Array<Class<IResource>> = [Stable, Nightly];
 	
 	public static function main() {
 		var librunner = new LibRunner( Sys.args() );
