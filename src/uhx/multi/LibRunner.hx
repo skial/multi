@@ -75,7 +75,14 @@ class LibRunner {
 			config.saveContent( Serializer.run( configData ) );
 			
 		} else {
-			configData = Unserializer.run( config.getContent() );
+			try {
+				configData = Unserializer.run( config.getContent() );
+				
+			} catch (e:Dynamic) {
+				// TODO prompt user if its ok to wipe old data & start from stratch?
+				throw e;
+				
+			}
 			
 		}
 		

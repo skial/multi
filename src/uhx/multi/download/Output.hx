@@ -1,6 +1,8 @@
 package uhx.multi.download;
 
+import byte.ByteData;
 import haxe.io.Bytes;
+import haxe.io.BytesOutput;
 import haxe.io.Output as HO;
 
 /**
@@ -36,13 +38,14 @@ class Output extends haxe.io.Output {
 	
 	override public function prepare(nbytes:Int) {
 		progress.maximum = nbytes;
-		//original.prepare(nbytes);
+		original.prepare(nbytes);
 	}
 	
 	override public function close() {
-		super.close();
-		//original.close();
+		progress.current = progress.maximum;
 		progress.next();
+		
+		super.close();
 	}
 	
 }

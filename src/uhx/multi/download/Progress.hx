@@ -17,8 +17,8 @@ class Progress {
 		
 	}
 	
-	public inline function hasNext():Bool {
-		return current != maximum;
+	public function hasNext():Bool {
+		return current < maximum;
 	}
 	
 	public function next():Void {

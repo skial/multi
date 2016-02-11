@@ -2,12 +2,14 @@ package uhx.multi.haxe;
 
 import haxe.Http;
 import haxe.Json;
+import tjson.TJSON;
 import uhx.multi.Download;
-import uhx.multi.download.Request;
-import uhx.multi.download.Type;
 import uhx.multi.IResource;
-import uhx.multi.download.Output;
 import uhx.multi.structs.Data;
+import uhx.multi.download.Type;
+import uhx.multi.download.Output;
+import uhx.multi.download.Request;
+import uhx.multi.structs.StableVersions;
 
 using sys.io.File;
 using haxe.io.Path;
@@ -26,7 +28,7 @@ class Stable implements IResource {
 	private var config:Data;
 	private var directory:String;
 	private var localVersions:String;
-	private var localVersionsData:Dynamic;
+	private var localVersionsData:StableVersions = null;
 	
 	public function new(directory:String, config:Data) {
 		this.config = config;
@@ -35,28 +37,29 @@ class Stable implements IResource {
 		initialize();
 	}
 	
-	@:keep
 	private function initialize():Void {
 		localVersions = '$directory/versions.json';
-		trace( localVersions );
+		
 		if (!localVersions.exists()) {
-			trace( 'downloading $localVersions' );
+			
 			var downloaded:Download = null;
 			var request = new Request( versions, localVersions );
 			
+			// `Request::fetch` is a macro built generator, 
+			// returning an iterator, using returns to yield.
 			for (download in request.fetch()) if (download != null) {
 				downloaded = download;
-				break;
 				
 			}
 			
-			trace( downloaded );
-			
-		} else {
-			trace( '$localVersions exists' );
-			localVersionsData = Json.parse( localVersions.getContent() );
+			localVersions.saveBytes( request.buffer.getBytes() );
+			config.downloads.push( downloaded );
+			request.dispose();
 			
 		}
+		
+		
+		trace( localVersionsData = TJSON.parse(localVersions.getContent()) );
 	}
 	
 	public function exists(values:Array<String>):Bool {

@@ -6,9 +6,11 @@
 -lib thx.unit
 -lib thx.format
 -lib thx.semver
+-lib tjson
 -cp src
 -D dump=pretty
 -dce no
+-debug
 
 --each
 

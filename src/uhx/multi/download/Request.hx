@@ -1,6 +1,9 @@
 package uhx.multi.download;
 
+import haxe.CallStack;
 import haxe.Http;
+import haxe.io.Bytes;
+import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 import sys.io.FileOutput;
 import uhx.multi.Download;
@@ -20,14 +23,15 @@ class Request {
 	public var http:Http;
 	public var output:Output;
 	public var savedTo:String;
-	//public var buffer:BytesOutput;
+	public var buffer:BytesOutput;
 	public var download:Null<Download> = new Download();
 	public var completed:Bool = false;
 
 	public function new(url:String, saveTo:String) {
 		this.savedTo = saveTo;
-		//this.buffer = new BytesOutput();
-		this.output = new Output( savedTo.write( true ) );
+		this.buffer = new BytesOutput();
+		this.output = new Output( buffer );
+		//this.output = new Output( savedTo.write( true ) );
 		
 		http = new Http( url );
 		http.onError = onError;
@@ -45,20 +49,25 @@ class Request {
 			return download;
 			
 		}
-		
+	}
+	
+	public function dispose():Void {
+		buffer.close();
+		output.close();
 	}
 	
 	private function onError(e:String):Void {
+		trace( e );
+		trace( CallStack.exceptionStack() );
 		download = null;
 		output.close();
 	}
 	
 	private function onStatus(s:Int):Void {
-		completed = true;
 		download.installed = Timer.time();
 		download.path = this.savedTo;
 		download.type = Type.Resource;
-		output.close();
+		completed = true;
 	}
 	
 }
