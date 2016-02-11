@@ -10,7 +10,7 @@ class Data {
 	
 	public var current:Download = null;
 	public var configs:Array<String> = [];
-	public var downloaded:Array<Download> = [];
+	public var downloads:Array<Download> = [];
 	
 	public inline function new() {
 		

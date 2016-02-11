@@ -1,9 +1,14 @@
 -lib mo
 -lib cmd
+-lib yield
 -lib hxssl
 -lib thx.core
+-lib thx.unit
+-lib thx.format
 -lib thx.semver
 -cp src
+-D dump=pretty
+-dce no
 
 --each
 

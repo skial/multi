@@ -25,8 +25,6 @@ using thx.semver.Version;
 @:cmd
 class LibRunner {
 	
-	private static var handlers:Array<Class<IResource>> = [Stable, Nightly];
-	
 	public static function main() {
 		var librunner = new LibRunner( Sys.args() );
 		librunner.exit();
@@ -70,7 +68,7 @@ class LibRunner {
 	private function setup():Void {
 		config = '$userProfile/$config'.normalize();
 		if (directory == null) directory = '$userProfile/multihaxe/'.normalize();
-		trace( config, config.exists() );
+		trace( width, config, config.exists() );
 		
 		if (!config.exists()) {
 			configData = new Data();
@@ -93,19 +91,21 @@ class LibRunner {
 			trace( versions );
 			switch (versions) {
 				case ['stable']:
-					
+					var handler = new Stable( this.directory, configData );
 					
 				case ['nightly']:
+					var handler = new Nightly( this.directory, configData );
 					
 					
 				case ['stable', Version.VERSION.match(_) => true]: 
 					var version = (versions[1]:Version);
 					
+					
 				case ['nightly', _.length >= 7 => true]:
 					
 					
 				case _:
-					Sys.println( 'Version `' + versions.join('-') + '` does not appear to exist.' );
+					Sys.println( 'The version you provided, `' + versions.join('-') + '`, does not appear to exist.' );
 					
 			}
 			

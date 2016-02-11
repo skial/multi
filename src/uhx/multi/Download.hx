@@ -10,8 +10,8 @@ class Download {
 	
 	public var type:Type;
 	public var path:String;
-	public var fetched:String;
-	public var installed:String;
+	public var fetched:Float;
+	public var installed:Float;
 	
 	public inline function new() {
 		
