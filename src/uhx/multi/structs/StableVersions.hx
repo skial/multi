@@ -1,5 +1,8 @@
 package uhx.multi.structs;
 
+import thx.DateTimeUtc;
+import thx.semver.Version;
+
 /**
  * @author Skial Bainn
  */
@@ -12,5 +15,5 @@ typedef StableVersion = {
 	var version:String;
 	var api:Bool;
 	var tag:String;
-	var date:String;
+	var date:DateTimeUtc;
 }
