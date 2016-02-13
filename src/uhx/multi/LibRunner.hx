@@ -1,5 +1,8 @@
 package uhx.multi;
 
+import haxe.ds.IntMap;
+import haxe.ds.StringMap;
+import uhx.multi.download.Type;
 import uhx.multi.haxe.Stable;
 import uhx.multi.haxe.Nightly;
 import uhx.multi.structs.Data;
@@ -9,6 +12,8 @@ import haxe.Serializer;
 import haxe.Unserializer;
 import thx.semver.Version;
 import uhx.multi.Util.*;
+import uhx.multi.structs.Installation;
+import thx.DateTimeUtc;
 
 using StringTools;
 using sys.io.File;
@@ -29,6 +34,9 @@ class LibRunner {
 		var librunner = new LibRunner( Sys.args() );
 		librunner.exit();
 	}
+	
+	@alias('b')
+	public var backup:Bool = false;
 	
 	@alias('i')
 	public var install:Null<String>;
@@ -58,7 +66,8 @@ class LibRunner {
 		
 		initialize();
 		setup();
-		process();
+		if (backup) startBackup();
+		if (install != null) process();
 	}
 	
 	private function initialize():Void {
@@ -99,6 +108,8 @@ class LibRunner {
 			switch (versions) {
 				case ['stable']:
 					var handler = new Stable( this.directory, configData );
+					trace( handler.exists( versions ) );
+					trace( handler.get( versions ) );
 					
 				case ['nightly']:
 					var handler = new Nightly( this.directory, configData );
@@ -106,7 +117,9 @@ class LibRunner {
 					
 				case ['stable', Version.VERSION.match(_) => true]: 
 					var version = (versions[1]:Version);
-					
+					var handler = new Stable( this.directory, configData );
+					trace( handler.exists( versions ) );
+					trace( handler.get( versions ) );
 					
 				case ['nightly', _.length >= 7 => true]:
 					
@@ -147,6 +160,43 @@ class LibRunner {
 		}
 		
 		return results;
+	}
+	
+	private function startBackup():Void {
+		var envars = Sys.environment();
+		var currentInstall = new Installation();
+		var interested = ['HAXE_STD_PATH', 'HAXELIB_PATH', 'HAXEPATH'];
+		
+		for (interest in interested) if (envars.exists( interest )) {
+			currentInstall.environment.set( interest, envars.get( interest ) );
+			
+		}
+		
+		// TODO sort default installation path based on platform.
+		currentInstall.path = currentInstall.environment.exists( 'HAXEPATH' ) 
+			? currentInstall.environment.get( 'HAXEPATH' )
+			: '/HaxeToolkit/';
+		currentInstall.fetched = currentInstall.installed = DateTimeUtc.now().toTime();
+		currentInstall.type = Type.Local;
+		
+		configData.original = currentInstall;
+	}
+	
+	public function ask(question:String, options:StringMap<Bool>):Bool {
+		var stdin = Sys.stdin();
+		var stdout = Sys.stdout();
+		
+		stdout.writeString( '$question\n' );
+		var response = stdin.readLine();
+		
+		if (options.exists( response )) {
+			return options.get( response );
+			
+		} else {
+			return false;
+			
+		}
+		
 	}
 	
 	private function save():Void {
