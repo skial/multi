@@ -4,7 +4,7 @@ import haxe.Http;
 import haxe.Json;
 import tjson.TJSON;
 import thx.semver.Version;
-import uhx.multi.Download;
+import uhx.multi.structs.Download;
 import uhx.multi.IResource;
 import uhx.multi.structs.Data;
 import uhx.multi.download.Type;
@@ -82,12 +82,28 @@ class Stable implements IResource {
 			case ['stable']:
 				var latest = localVersionsData.versions.filter( function(v) return v.version == localVersionsData.current )[0];
 				var url = constructUrl( latest );
-				result = request( url, '$directory/stable/' + latest.version + '/haxe/' + url.withoutDirectory() );
+				var saveTo = '$directory/stable/' + latest.version + '/haxe/' + url.withoutDirectory();
+				
+				if (!saveTo.exists()) {
+					result = request( url, saveTo );
+					
+				} else {
+					Sys.println( 'You already have Haxe ' + latest.version.toString() + ', located at $saveTo' );
+					
+				}
 				
 			case ['stable', Version.VERSION.match(_) => true]:
 				var match = localVersionsData.versions.filter( function(v) return (v.version:Version) == (values[1]:Version) )[0];
 				var url = constructUrl( match );
-				result = request( url, '$directory/stable/' + match.version + '/haxe/' + url.withoutDirectory() );
+				var saveTo = '$directory/stable/' + match.version + '/haxe/' + url.withoutDirectory();
+				
+				if (!saveTo.exists()) {
+					result = request( url, saveTo );
+					
+				} else {
+					Sys.println( 'You already have Haxe ' + match.version.toString() + ', located at $saveTo' );
+					
+				}
 				
 			case _:
 				throw 'Unmatched version: ' + values;

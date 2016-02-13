@@ -10,4 +10,5 @@ package uhx.multi.download;
 	var Stable = 2;
 	var Config = 3;
 	var Resource = 4;
+	var Local = 5;
 }

@@ -1,4 +1,4 @@
-package uhx.multi;
+package uhx.multi.structs;
 
 import uhx.multi.download.Type;
 

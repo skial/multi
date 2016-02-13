@@ -1,13 +1,13 @@
 package uhx.multi.download;
 
-import haxe.CallStack;
 import haxe.Http;
 import haxe.io.Bytes;
+import haxe.CallStack;
+import sys.io.FileOutput;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
-import sys.io.FileOutput;
-import uhx.multi.Download;
 import uhx.multi.download.Type;
+import uhx.multi.structs.Download;
 
 using Thx;
 using sys.io.File;
