@@ -14,6 +14,7 @@ import thx.semver.Version;
 import uhx.multi.Util.*;
 import uhx.multi.structs.Installation;
 import thx.DateTimeUtc;
+import uhx.sys.Ioe;
 
 using StringTools;
 using sys.io.File;
@@ -28,24 +29,18 @@ using thx.semver.Version;
  * @author Skial Bainn
  */
 @:cmd
-class LibRunner {
+class LibRunner extends Ioe {
 	
 	public static function main() {
 		var librunner = new LibRunner( Sys.args() );
 		librunner.exit();
 	}
 	
-	@alias('b')
-	public var backup:Bool = false;
-	
-	@alias('i')
-	public var install:Null<String>;
+	public var haxe:Haxe;
+	public var neko:Neko;
 	
 	@alias('u')
 	public var update:Null<String>;
-	
-	@alias('x')
-	public var uninstall:Null<String>;
 	
 	@alias('r')
 	public var reset:Bool = false;
@@ -62,12 +57,11 @@ class LibRunner {
 	private var configData:Data = null;
 
 	public function new(args:Array<String>) {
+		super();
 		@:cmd _;
-		
 		initialize();
 		setup();
-		if (backup) startBackup();
-		if (install != null) process();
+		//if (install != null) process();
 	}
 	
 	private function initialize():Void {
@@ -77,7 +71,6 @@ class LibRunner {
 	private function setup():Void {
 		config = '$userProfile/$config'.normalize();
 		if (directory == null) directory = '$userProfile/multihaxe/'.normalize();
-		trace( width, config, config.exists() );
 		
 		if (!config.exists()) {
 			configData = new Data();
@@ -95,14 +88,16 @@ class LibRunner {
 			
 		}
 		
+		if (configData.original == null) backup();
+		
 		configIO = config.write();
 		
 		if (!directory.exists()) directory.createDirectory();
 	}
 	
-	@:access(thx.semver.Version)
-	private function process():Void {
-		if (install != null) {
+	//@:access(thx.semver.Version)
+	//private function process():Void {
+		/*if (install != null) {
 			var versions = findVersion( install );
 			trace( versions );
 			switch (versions) {
@@ -129,9 +124,9 @@ class LibRunner {
 					
 			}
 			
-		}
+		}*/
 		
-	}
+	//}
 	
 	private function findVersion(value:String):Array<String> {
 		var results = [];
@@ -162,10 +157,10 @@ class LibRunner {
 		return results;
 	}
 	
-	private function startBackup():Void {
+	private function backup():Void {
 		var envars = Sys.environment();
 		var currentInstall = new Installation();
-		var interested = ['HAXE_STD_PATH', 'HAXELIB_PATH', 'HAXEPATH'];
+		var interested = ['HAXE_STD_PATH', 'HAXELIB_PATH', 'HAXEPATH', 'LD_LIBRARY_PATH', 'NEKOPATH'];
 		
 		for (interest in interested) if (envars.exists( interest )) {
 			currentInstall.environment.set( interest, envars.get( interest ) );
@@ -175,28 +170,11 @@ class LibRunner {
 		// TODO sort default installation path based on platform.
 		currentInstall.path = currentInstall.environment.exists( 'HAXEPATH' ) 
 			? currentInstall.environment.get( 'HAXEPATH' )
-			: '/HaxeToolkit/';
+			: '/HaxeToolkit/haxe/';
 		currentInstall.fetched = currentInstall.installed = DateTimeUtc.now().toTime();
 		currentInstall.type = Type.Local;
 		
 		configData.original = currentInstall;
-	}
-	
-	public function ask(question:String, options:StringMap<Bool>):Bool {
-		var stdin = Sys.stdin();
-		var stdout = Sys.stdout();
-		
-		stdout.writeString( '$question\n' );
-		var response = stdin.readLine();
-		
-		if (options.exists( response )) {
-			return options.get( response );
-			
-		} else {
-			return false;
-			
-		}
-		
 	}
 	
 	private function save():Void {
@@ -204,9 +182,10 @@ class LibRunner {
 		configIO.writeString( Serializer.run( configData ) );
 	}
 	
-	public function exit():Void {
+	@:skip(cmd) override public function exit():Void {
 		save();
 		configIO.close();
+		super.exit();
 	}
 	
 }
