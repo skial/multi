@@ -1,7 +1,7 @@
 -lib mo
 -lib cmd
 -lib yield
--lib hxssl
+#-lib hxssl
 -lib thx.core
 -lib thx.unit
 -lib thx.format
@@ -14,7 +14,7 @@
 
 --each
 
--neko bin/multihaxe.n
+-neko bin/multi.n
 -main uhx.multi.LibRunner
 
 --next
