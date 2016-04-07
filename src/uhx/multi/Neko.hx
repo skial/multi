@@ -1,25 +1,19 @@
 package uhx.multi;
 
 import haxe.ds.StringMap;
+import uhx.multi.structs.Data;
 
 /**
  * ...
  * @author Skial Bainn
  */
 @:cmd
-class Neko {
-	
-	@alias('i')
-	public var install:Null<String>;
-	
-	@alias('u')
-	public var uninstall:Null<String>;
-	
-	@alias('r')
-	public var reinstall:Null<String>;
+class Neko extends Program {
 
-	public function new(args:StringMap<Array<Dynamic>>) {
-		
+	public function new(args:StringMap<Array<Dynamic>>, directory:String) {
+		super( args, directory, 'neko' );
+		@:cmd _;
 	}
+	
 	
 }

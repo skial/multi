@@ -1,6 +1,7 @@
 package uhx.multi.haxe;
 
 import uhx.multi.structs.Data;
+import uhx.multi.structs.Download;
 
 /**
  * ...
@@ -14,6 +15,24 @@ class Nightly implements IResource {
 	
 	public function new(directory:String, config:Data) {
 		
+	}
+	
+	public function exists(values:Array<String>):Bool {
+		return false;
+	}
+	
+	public function get(values:Array<String>):Null<Download> {
+		var result = null;
+		
+		return result;
+	}
+	
+	@:access(thx.semver.Version)
+	public function describe(values:Array<String>):Download {
+		var result = new Download();
+		
+		
+		return result;
 	}
 	
 }

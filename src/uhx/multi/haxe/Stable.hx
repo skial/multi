@@ -47,9 +47,7 @@ class Stable implements IResource {
 			
 		}
 		
-		
 		localVersionsData = TJSON.parse(localVersions.getContent());
-		
 	}
 	
 	@:access(thx.semver.Version)
@@ -82,7 +80,7 @@ class Stable implements IResource {
 			case ['stable']:
 				var latest = localVersionsData.versions.filter( function(v) return v.version == localVersionsData.current )[0];
 				var url = constructUrl( latest );
-				var saveTo = '$directory/stable/' + latest.version + '/haxe/' + url.withoutDirectory();
+				var saveTo = '$directory/stable/haxe/' + latest.version + '/' + url.withoutDirectory();
 				
 				if (!saveTo.exists()) {
 					result = request( url, saveTo );
@@ -113,6 +111,29 @@ class Stable implements IResource {
 		return result;
 	}
 	
+	@:access(thx.semver.Version)
+	public function describe(values:Array<String>):Download {
+		var result = new Download();
+		result.path = '<unknown>';
+		result.type = Type.Resource;
+		result.installed = result.fetched = -1.0;
+		
+		switch (values) {
+			case ['stable']:
+				var latest = localVersionsData.versions.filter( function(v) return v.version == localVersionsData.current )[0];
+				result.path = '$directory/stable/haxe/' + latest.version + '/' +  constructUrl( latest ).withoutDirectory();
+				
+			case ['stable', Version.VERSION.match(_) => true]:
+				var match = localVersionsData.versions.filter( function(v) return (v.version:Version) == (values[1]:Version) )[0];
+				result.path = '$directory/stable/' + match.version + '/haxe/' + constructUrl( match ).withoutDirectory();
+				
+			case _:
+				
+		}
+		
+		return result;
+	}
+	
 	private function constructUrl(version:StableVersion):String {
 		var result = '$download/' + version.version + '/downloads/haxe-' + version.version + '-';
 		
@@ -129,9 +150,9 @@ class Stable implements IResource {
 	private function request(url:String, saveTo:String):Null<Download> {
 		var downloaded:Download = null;
 		var request = new Request( url, saveTo );
-		trace( saveTo);
+		trace( saveTo );
 		trace( url );
-		if (!saveTo.directory().exists()) buildDirectory( saveTo.directory() );
+		if (!saveTo.directory().exists()) buildDirectory( saveTo.directory().addTrailingSlash() );
 		
 		// `Request::fetch` is a macro built generator, 
 		// returning an iterator, using returns to yield.

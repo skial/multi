@@ -11,6 +11,8 @@ import haxe.io.Output;
 import haxe.Serializer;
 import haxe.Unserializer;
 import thx.semver.Version;
+import uhx.multi.win.WindowsHelper;
+import uhx.multi.win.WindowsHelper.*;
 import uhx.multi.Util.*;
 import uhx.multi.structs.Installation;
 import thx.DateTimeUtc;
@@ -32,12 +34,13 @@ using thx.semver.Version;
 class LibRunner extends Ioe {
 	
 	public static function main() {
+		if (Sys.systemName() == 'Windows') WindowsHelper.initialize();
 		var librunner = new LibRunner( Sys.args() );
 		librunner.exit();
 	}
 	
-	public var haxe:Haxe;
-	public var neko:Neko;
+	public var haxe:Haxe = Haxe.new.bind(_, directory);
+	public var neko:Neko = Neko.new.bind(_, directory);
 	
 	@alias('u')
 	public var update:Null<String>;
@@ -50,49 +53,15 @@ class LibRunner extends Ioe {
 	
 	@alias('l')
 	public var local:Bool = false;
-	
-	@alias('c')
-	public var config:String = '.multihaxe';
-	private var configIO:Output = null;
-	private var configData:Data = null;
 
 	public function new(args:Array<String>) {
 		super();
 		@:cmd _;
 		initialize();
-		setup();
-		//if (install != null) process();
 	}
 	
 	private function initialize():Void {
-		Util.initialize();
-	}
-	
-	private function setup():Void {
-		config = '$userProfile/$config'.normalize();
-		if (directory == null) directory = '$userProfile/multihaxe/'.normalize();
 		
-		if (!config.exists()) {
-			configData = new Data();
-			config.saveContent( Serializer.run( configData ) );
-			
-		} else {
-			try {
-				configData = Unserializer.run( config.getContent() );
-				
-			} catch (e:Dynamic) {
-				// TODO prompt user if its ok to wipe old data & start from stratch?
-				throw e;
-				
-			}
-			
-		}
-		
-		if (configData.original == null) backup();
-		
-		configIO = config.write();
-		
-		if (!directory.exists()) directory.createDirectory();
 	}
 	
 	//@:access(thx.semver.Version)
@@ -157,34 +126,16 @@ class LibRunner extends Ioe {
 		return results;
 	}
 	
-	private function backup():Void {
-		var envars = Sys.environment();
-		var currentInstall = new Installation();
-		var interested = ['HAXE_STD_PATH', 'HAXELIB_PATH', 'HAXEPATH', 'LD_LIBRARY_PATH', 'NEKOPATH'];
-		
-		for (interest in interested) if (envars.exists( interest )) {
-			currentInstall.environment.set( interest, envars.get( interest ) );
-			
-		}
-		
-		// TODO sort default installation path based on platform.
-		currentInstall.path = currentInstall.environment.exists( 'HAXEPATH' ) 
-			? currentInstall.environment.get( 'HAXEPATH' )
-			: '/HaxeToolkit/haxe/';
-		currentInstall.fetched = currentInstall.installed = DateTimeUtc.now().toTime();
-		currentInstall.type = Type.Local;
-		
-		configData.original = currentInstall;
-	}
-	
 	private function save():Void {
 		Serializer.USE_CACHE = true;
-		configIO.writeString( Serializer.run( configData ) );
+		for (program in [haxe, neko]) if (program != null) {
+			program.save();
+			
+		}
 	}
 	
 	@:skip(cmd) override public function exit():Void {
 		save();
-		configIO.close();
 		super.exit();
 	}
 	

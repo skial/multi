@@ -1,6 +1,7 @@
 package uhx.multi.download;
 
 import thx.unit.digital.Byte;
+import uhx.multi.win.WindowsHelper.*;
 
 using Thx;
 
@@ -24,7 +25,7 @@ class Progress {
 	public function next():Void {
 		var currentMeg = (current:Byte).toMegabyte().toString();
 		var maximunMeg = (maximum:Byte).toMegabyte().toString();
-		var columns = (Util.width - 6) - currentMeg.length - maximunMeg.length;
+		var columns = (width - 6) - currentMeg.length - maximunMeg.length;
 		var loaded = (Std.int((current / maximum) * columns));
 		var remainder = (columns - (Std.int((current / maximum) * columns)));
 		

@@ -1,8 +1,9 @@
 package uhx.multi;
 
-import haxe.Json;
-import sys.io.Process;
-import uhx.multi.structs.WindowsJson;
+import uhx.multi.Builds;
+import thx.semver.Version;
+
+using StringTools;
 
 /**
  * ...
@@ -10,32 +11,39 @@ import uhx.multi.structs.WindowsJson;
  */
 class Util {
 	
-	public static var raw:WindowsJson = null;
-	@:isVar public static var width(get, null):Int;
-	public static var is64BitOS(get, null):Bool;
-	public static var userProfile(get, null):String;
+	public static var builds:Array<String> = [Stable, Nightly];
 	
-	public static function initialize():Void {
-		var process = new Process( 'Helper.exe', [] );
-		var string = process.stdout.readAll().toString();
-		raw = Json.parse( string );
-		process.exitCode();
-		process.close();
-	}
-	
-	private static function get_is64BitOS():Bool {
-		return (raw != null) ? raw.is64Bit : false;
-	}
-	
-	private static function get_userProfile():String {
-		return (raw != null) ? 
-			((raw.userProfile != '') ? raw.userProfile : Sys.environment().exists('USERPROFILE') ? Sys.getEnv('USERPROFILE') : raw.localApplicationData)
-			: raw.localApplicationData;
-	}
-	
-	private static function get_width():Int {
-		if (width == null) width = raw.width != null ? raw.width : 80;
-		return width;
+	@:access(thx.semver.Version)
+	public static function resolveVersion(value:String, ?recursive:Bool = false):Array<String> {
+		var results = [];
+		
+		switch (value) {
+			case _.startsWith( Stable ) => true:
+				results.push( Stable );
+				if (value.charCodeAt(6) == '-'.code) results = results.concat( resolveVersion( value.substring( 7 ), true ) );
+				
+			case _.startsWith( Nightly ) => true:
+				results.push( Nightly );
+				if (value.charCodeAt(7) == '-'.code) results = results.concat( resolveVersion( value.substr( 8 ), true ) );
+				
+			case x if (x.length == 7 || x.length == 40):// git sha number
+				if (!recursive) results.push( Nightly );
+				results.push( x.trim() );
+				
+			case x if (x.indexOf('-') > -1):// date YYYY-MM-DD
+				if (!recursive) results.push( Stable );
+				results.push( x.trim() );
+				
+			case x if (x.indexOf('.') > -1):// 3.2.0
+				if (!recursive) results.push( Stable );
+				results.push( x.trim() );
+				
+			case _:
+				
+				
+		}
+		
+		return results;
 	}
 	
 }
