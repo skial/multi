@@ -10,7 +10,7 @@ import uhx.multi.structs.Data;
 @:cmd
 class Neko extends Program {
 
-	public function new(args:StringMap<Array<Dynamic>>, directory:String) {
+	public function new(args:Array<String>, directory:String) {
 		super( args, directory, 'neko' );
 		@:cmd _;
 	}

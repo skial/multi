@@ -30,7 +30,7 @@ class Progress {
 		var remainder = (columns - (Std.int((current / maximum) * columns)));
 		
 		Sys.stdout().writeString( 
-			'[' + [for (i in 0...loaded) '='].join('') + [for (i in 0...remainder) ' '].join('') + '][' + currentMeg + '/' + maximunMeg + ']' + (current == maximum ? '\n' : '\r')
+			'[' + [for (i in 0...loaded) '='].join('') + [for (i in 0...remainder) ' '].join('') + '][' + currentMeg + '/' + maximunMeg + ']' + '\r'
 		);
 		
 	}

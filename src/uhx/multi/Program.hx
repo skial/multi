@@ -40,19 +40,26 @@ class Program {
 	private var configIO:Output;
 	private var directory:String;
 
-	public function new(args:StringMap<Array<Dynamic>>, directory:String, name:String) {
+	public function new(args:Array<String>, directory:String, name:String) {
 		this.name = name;
 		this.config = '.multi$name';
 		this.directory = directory;
-		@:cmd _;
+		@:cmd !_;	// Hint to `Ede` that I don't want the auto generated method `::edeProcessArgs` inserted and called.
+	}
+	
+	@alias('a')
+	public function available():String {
+		throw 'Not implemented';
+		return '';
 	}
 	
 	private function setup():Void {
 		config = '$userProfile/$config'.normalize();
 		if (directory == null) directory = '$userProfile/multi$name/'.normalize();
-		
+		trace( config, directory, config.exists() );
 		if (!config.exists()) {
 			configData = new Data();
+			trace( configData, Serializer.run( configData ) );
 			config.saveContent( Serializer.run( configData ) );
 			
 		} else {
@@ -61,7 +68,10 @@ class Program {
 				
 			} catch (e:Dynamic) {
 				// TODO prompt user if its ok to wipe old data & start from stratch?
-				throw e;
+				trace( e );
+				configData = new Data();
+				trace( configData, Serializer.run( configData ) );
+				config.saveContent( Serializer.run( configData ) );
 				
 			}
 			
@@ -155,6 +165,7 @@ class Program {
 	}
 	
 	@:skip(cmd) public function save():Void {
+		trace( Serializer.run( configData ) );
 		configIO.writeString( Serializer.run( configData ) );
 		
 	}

@@ -50,6 +50,16 @@ class Stable implements IResource {
 		localVersionsData = TJSON.parse(localVersions.getContent());
 	}
 	
+	public function available():Array<String> {
+		var results = [];
+		
+		for (info in localVersionsData.versions) {
+			results.push( '"${info.version}" released ${info.date}' );
+		}
+		
+		return results;
+	}
+	
 	@:access(thx.semver.Version)
 	public function exists(values:Array<String>):Bool {
 		var result = false;
@@ -64,6 +74,9 @@ class Stable implements IResource {
 					localVersionsData != null && 
 					localVersionsData.current != null && 
 					[for (info in localVersionsData.versions) if ((info.version:Version) == version) true].length > 0;
+					
+			case [Version.VERSION.match(_) => true]:
+				result = localVersionsData != null && (values[0]:Version) <= (localVersionsData.current:Version);
 				
 			case _:
 				
@@ -93,13 +106,35 @@ class Stable implements IResource {
 			case ['stable', Version.VERSION.match(_) => true]:
 				var match = localVersionsData.versions.filter( function(v) return (v.version:Version) == (values[1]:Version) )[0];
 				var url = constructUrl( match );
-				var saveTo = '$directory/stable/' + match.version + '/haxe/' + url.withoutDirectory();
+				var saveTo = '$directory/stable/haxe/' + match.version + '/' + url.withoutDirectory();
 				
 				if (!saveTo.exists()) {
 					result = request( url, saveTo );
 					
 				} else {
 					Sys.println( 'You already have Haxe ' + match.version.toString() + ', located at $saveTo' );
+					
+				}
+				
+			case [Version.VERSION.match(_) => true]:
+				var semver:Version = values[0];
+				
+				if (semver > (localVersionsData.current:Version)) {
+					// prompt the user if they want to fetch latest nightly build?
+					// or see a list of haxe releases?
+					
+				} else {
+					var match = localVersionsData.versions.filter( function(v) return (v.version:Version) == semver)[0];
+					var url = constructUrl( match );
+					var saveTo = '$directory/stable/haxe/' + match.version + '/' + url.withoutDirectory();
+					
+					if (!saveTo.exists()) {
+						result = request( url, saveTo );
+						
+					} else {
+						Sys.println( 'You already have Haxe ' + match.version.toString() + ', located at $saveTo' );
+						
+					}
 					
 				}
 				
@@ -150,8 +185,7 @@ class Stable implements IResource {
 	private function request(url:String, saveTo:String):Null<Download> {
 		var downloaded:Download = null;
 		var request = new Request( url, saveTo );
-		trace( saveTo );
-		trace( url );
+		
 		if (!saveTo.directory().exists()) buildDirectory( saveTo.directory().addTrailingSlash() );
 		
 		// `Request::fetch` is a macro built generator, 

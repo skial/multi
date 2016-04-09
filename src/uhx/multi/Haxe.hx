@@ -18,17 +18,27 @@ class Haxe extends Program {
 	private var stable:Stable;
 	private var nightly:Nightly;
 
-	public function new(args:StringMap<Array<Dynamic>>, directory:String) {
+	public function new(args:Array<String>, directory:String) {
 		super( args, directory, 'haxe' );
-		@:cmd _;
 		setup();
 		initialize();
+		@:cmd _;
 		process();
 	}
 	
 	private function initialize() {
 		stable = new Stable( this.directory, this.configData );
 		nightly = new Nightly( this.directory, this.configData );
+	}
+	
+	override public function available():String {
+		var result = '';
+		trace( stable );
+		trace( stable.available() );
+		result += 'Stable releases available:\n';
+		result += stable.available().join( '\n\t' );
+		
+		return result;
 	}
 	
 	override private function doInstall(info:Array<String>):Bool {
@@ -83,7 +93,7 @@ class Haxe extends Program {
 					
 				}
 				
-				configData.downloads = configData.downloads.filter( function(dl) return dl.path != download.path );
+				configData.downloads = configData.downloads.filter( function(dl) return dl != null && dl.path != download.path );
 				
 			}
 			

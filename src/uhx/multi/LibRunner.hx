@@ -39,7 +39,8 @@ class LibRunner extends Ioe {
 		librunner.exit();
 	}
 	
-	public var haxe:Haxe = Haxe.new.bind(_, directory);
+	@:native('haxe')
+	public var _haxe:Haxe = Haxe.new.bind(_, directory);
 	public var neko:Neko = Neko.new.bind(_, directory);
 	
 	@alias('u')
@@ -56,8 +57,8 @@ class LibRunner extends Ioe {
 
 	public function new(args:Array<String>) {
 		super();
-		@:cmd _;
 		initialize();
+		@:cmd _;
 	}
 	
 	private function initialize():Void {
@@ -127,10 +128,14 @@ class LibRunner extends Ioe {
 	}
 	
 	private function save():Void {
+		// TODO replace serializer, its too fragile.
+		// TODO if data is corrupt, rebuild based on contents of /multi/ directory.
 		Serializer.USE_CACHE = true;
-		for (program in [haxe, neko]) if (program != null) {
+		for (program in [_haxe, neko]) if (program != null) {
 			program.save();
 			
+		} else {
+			trace( 'program is null' );
 		}
 	}
 	

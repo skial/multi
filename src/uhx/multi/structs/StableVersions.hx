@@ -15,5 +15,5 @@ typedef StableVersion = {
 	var version:String;
 	var api:Bool;
 	var tag:String;
-	var date:DateTimeUtc;
+	var date:String;
 }

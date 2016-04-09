@@ -17,6 +17,12 @@ class Nightly implements IResource {
 		
 	}
 	
+	public function available():Array<String> {
+		var results:Array<String> = [];
+		
+		return results;
+	}
+	
 	public function exists(values:Array<String>):Bool {
 		return false;
 	}
