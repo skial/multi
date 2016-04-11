@@ -48,9 +48,8 @@ class Program {
 	}
 	
 	@alias('a')
-	public function available():String {
+	public function available():Void {
 		throw 'Not implemented';
-		return '';
 	}
 	
 	private function setup():Void {

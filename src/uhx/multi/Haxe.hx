@@ -31,14 +31,13 @@ class Haxe extends Program {
 		nightly = new Nightly( this.directory, this.configData );
 	}
 	
-	override public function available():String {
-		var result = '';
-		trace( stable );
-		trace( stable.available() );
-		result += 'Stable releases available:\n';
-		result += stable.available().join( '\n\t' );
+	override public function available():Void {
+		var output = '';
 		
-		return result;
+		output += 'Stable releases available:\n--------------------------\n  ';
+		output += stable.available().join( '\n  ' );
+		
+		Sys.println( output );
 	}
 	
 	override private function doInstall(info:Array<String>):Bool {

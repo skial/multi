@@ -54,8 +54,11 @@ class Stable implements IResource {
 		var results = [];
 		
 		for (info in localVersionsData.versions) {
-			results.push( '"${info.version}" released ${info.date}' );
+			results.push( '${info.version} => ${info.date}' );
 		}
+		
+		// Newest version first.
+		results.reverse();
 		
 		return results;
 	}
