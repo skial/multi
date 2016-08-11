@@ -1,9 +1,12 @@
 package uhx.multi;
 
+import thx.DateTime;
 import uhx.multi.Builds;
 import thx.semver.Version;
+import thx.format.DateFormat;
 
 using StringTools;
+using sys.FileSystem;
 
 /**
  * ...
@@ -44,6 +47,28 @@ class Util {
 		}
 		
 		return results;
+	}
+	
+	public static function buildDirectory(path:String):Void {
+		var path = path.split( '/' );
+		var complete = path.shift();
+		
+		for (i in 0...path.length - 1) {
+			trace( '$complete/${path[i]}' );
+			if (!'$complete/${path[i]}'.exists()) {
+				complete = '$complete/${path[i]}';
+				complete.createDirectory();
+				
+			} else {
+				complete = '$complete/${path[i]}';
+				
+			}
+			
+		}
+	}
+	
+	public static inline function format(date:DateTime):String {
+		return DateFormat.format(date, 'ddd dd MMM');
 	}
 	
 }

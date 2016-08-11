@@ -58,6 +58,7 @@ class Request {
 	
 	private function onError(e:String):Void {
 		trace( e );
+		// std@host_resolve => no internet connection?
 		trace( CallStack.exceptionStack() );
 		download = null;
 		output.close();

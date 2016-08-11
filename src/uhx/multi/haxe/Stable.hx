@@ -3,17 +3,19 @@ package uhx.multi.haxe;
 import haxe.Http;
 import haxe.Json;
 import tjson.TJSON;
+import thx.DateTimeUtc;
 import thx.semver.Version;
-import uhx.multi.structs.Download;
 import uhx.multi.IResource;
 import uhx.multi.structs.Data;
 import uhx.multi.download.Type;
 import uhx.multi.download.Output;
 import uhx.multi.download.Request;
+import uhx.multi.structs.Download;
 import uhx.multi.structs.StableVersions;
 
 using sys.io.File;
 using haxe.io.Path;
+using uhx.multi.Util;
 using sys.FileSystem;
 
 /**
@@ -39,7 +41,7 @@ class Stable implements IResource {
 	}
 	
 	private function initialize():Void {
-		localVersions = '$directory/versions.json';
+		localVersions = '$directory/stable/versions.json';
 		
 		if (!localVersions.exists()) {
 			var downloaded = request( versions, localVersions );
@@ -54,7 +56,7 @@ class Stable implements IResource {
 		var results = [];
 		
 		for (info in localVersionsData.versions) {
-			results.push( '${info.version} => ${info.date}' );
+			results.push( '${info.version} => ' + DateTimeUtc.fromString(info.date).toDateTime().format() + ' (${info.date})' );
 		}
 		
 		// Newest version first.
@@ -189,7 +191,7 @@ class Stable implements IResource {
 		var downloaded:Download = null;
 		var request = new Request( url, saveTo );
 		
-		if (!saveTo.directory().exists()) buildDirectory( saveTo.directory().addTrailingSlash() );
+		if (!saveTo.directory().exists()) saveTo.directory().addTrailingSlash().buildDirectory();
 		
 		// `Request::fetch` is a macro built generator, 
 		// returning an iterator, using returns to yield.
@@ -202,24 +204,6 @@ class Stable implements IResource {
 		request.dispose();
 		
 		return downloaded;
-	}
-	
-	public static function buildDirectory(path:String) {
-		var path = path.split( '/' );
-		var complete = path.shift();
-		
-		for (i in 0...path.length - 1) {
-			trace( '$complete/${path[i]}' );
-			if (!'$complete/${path[i]}'.exists()) {
-				complete = '$complete/${path[i]}';
-				complete.createDirectory();
-				
-			} else {
-				complete = '$complete/${path[i]}';
-				
-			}
-			
-		}
 	}
 	
 }

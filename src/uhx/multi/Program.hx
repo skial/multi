@@ -48,13 +48,13 @@ class Program {
 	}
 	
 	@alias('a')
-	public function available():Void {
+	public function available(?limit:Int = 10):Void {
 		throw 'Not implemented';
 	}
 	
 	private function setup():Void {
 		config = '$userProfile/$config'.normalize();
-		if (directory == null) directory = '$userProfile/multi$name/'.normalize();
+		if (directory == null) directory = '$userProfile/.multi/$name/'.normalize();
 		trace( config, directory, config.exists() );
 		if (!config.exists()) {
 			configData = new Data();

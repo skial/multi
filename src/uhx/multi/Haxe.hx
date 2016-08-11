@@ -31,11 +31,16 @@ class Haxe extends Program {
 		nightly = new Nightly( this.directory, this.configData );
 	}
 	
-	override public function available():Void {
+	override public function available(?limit:Int = 10):Void {
 		var output = '';
+		var availableStables = stable.available();
+		var availableNightlies = nightly.available();
 		
 		output += 'Stable releases available:\n--------------------------\n  ';
-		output += stable.available().join( '\n  ' );
+		output += [for (i in 0...availableStables.length) if (i <= limit-1) '${i+1}. ' + availableStables[i]].join( '\n  ' );
+		
+		output += '\n\nNightly releases available:\n--------------------------\n  ';
+		output += [for (i in 0...availableNightlies.length) if (i <= limit-1) '${i+1}. ' + availableNightlies[i]].join( '\n  ' );
 		
 		Sys.println( output );
 	}
